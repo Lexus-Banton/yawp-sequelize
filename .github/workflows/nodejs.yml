@@ -1,0 +1,29 @@
+name: Jest Tests
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: node:latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: alchemy
+          POSTGRES_PASSWORD: alchemy
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci --dev
+      - run: npx eslint .
+      - run: npm test
+        env:
+          CI: true
+          POSTGRES_USER: alchemy
+          POSTGRES_PASSWORD: alchemy
+          POSTGRES_DB_NAME: yawp_test
+          POSTGRES_DB_HOST: postgres
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
+          COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
